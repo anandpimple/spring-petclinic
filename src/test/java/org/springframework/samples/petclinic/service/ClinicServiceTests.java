@@ -141,6 +141,7 @@ public class ClinicServiceTests {
         Collection<PetType> types = this.pets.findPetTypes();
         pet.setType(EntityUtils.getById(types, PetType.class, 2));
         pet.setBirthDate(new Date());
+        pet.setWeight(10.10f);
         owner6.addPet(pet);
         assertThat(owner6.getPets().size()).isEqualTo(found + 1);
 

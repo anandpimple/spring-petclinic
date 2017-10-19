@@ -71,14 +71,55 @@ public class PetControllerTests {
     }
 
     @Test
-    public void testProcessCreationFormSuccess() throws Exception {
+    public void testProcessCreationFormSuccessWithMinWeight() throws Exception {
         mockMvc.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID)
             .param("name", "Betty")
             .param("type", "hamster")
             .param("birthDate", "2015/02/12")
+            .param("weight", "0.5")
         )
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/owners/{ownerId}"));
+    }
+
+    @Test
+    public void testProcessCreationFormSuccessWithMaxWeight() throws Exception {
+        mockMvc.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID)
+            .param("name", "Betty")
+            .param("type", "hamster")
+            .param("birthDate", "2015/02/12")
+            .param("weight", "2000.89")
+        )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/owners/{ownerId}"));
+    }
+
+    @Test
+    public void testProcessCreationFormErrorWithLessThanMinWeight() throws Exception {
+        mockMvc.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID)
+            .param("name", "Betty")
+            .param("type", "hamster")
+            .param("birthDate", "2015/02/12")
+            .param("weight", "0.49")
+        )
+            .andExpect(model().attributeHasNoErrors("owner"))
+            .andExpect(model().attributeHasErrors("pet"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("pets/createOrUpdatePetForm"));
+    }
+
+    @Test
+    public void testProcessCreationFormErrorWithMoreThanMaxWeight() throws Exception {
+        mockMvc.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID)
+            .param("name", "Betty")
+            .param("type", "hamster")
+            .param("birthDate", "2015/02/12")
+            .param("weight", "2000.90")
+        )
+            .andExpect(model().attributeHasNoErrors("owner"))
+            .andExpect(model().attributeHasErrors("pet"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("pets/createOrUpdatePetForm"));
     }
 
     @Test
@@ -86,12 +127,15 @@ public class PetControllerTests {
         mockMvc.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID)
             .param("name", "Betty")
             .param("birthDate", "2015/02/12")
+            .param("weight", "10.12")
         )
             .andExpect(model().attributeHasNoErrors("owner"))
             .andExpect(model().attributeHasErrors("pet"))
             .andExpect(status().isOk())
             .andExpect(view().name("pets/createOrUpdatePetForm"));
     }
+
+
 
     @Test
     public void testInitUpdateForm() throws Exception {
@@ -107,6 +151,7 @@ public class PetControllerTests {
             .param("name", "Betty")
             .param("type", "hamster")
             .param("birthDate", "2015/02/12")
+            .param("weight", "10.12")
         )
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/owners/{ownerId}"));
@@ -117,6 +162,7 @@ public class PetControllerTests {
         mockMvc.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID)
             .param("name", "Betty")
             .param("birthDate", "2015/02/12")
+            .param("weight", "10.12")
         )
             .andExpect(model().attributeHasNoErrors("owner"))
             .andExpect(model().attributeHasErrors("pet"))
