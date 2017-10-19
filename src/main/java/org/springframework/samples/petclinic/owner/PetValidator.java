@@ -15,6 +15,7 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -31,6 +32,11 @@ import org.springframework.validation.Validator;
 public class PetValidator implements Validator {
 
     private static final String REQUIRED = "required";
+    private static final String OUT_OF_RANGE = "outofrange";
+    @Value("minWeight")
+    private Float minWeight = 0.5f;
+    @Value("maxWeight")
+    private Float maxWeight = 2000.89f;
 
     @Override
     public void validate(Object obj, Errors errors) {
@@ -49,6 +55,13 @@ public class PetValidator implements Validator {
         // birth date validation
         if (pet.getBirthDate() == null) {
             errors.rejectValue("birthDate", REQUIRED, REQUIRED);
+        }
+
+        //0.5kg and 2000.89 kg.
+        if(pet.getWeight() == null) {
+            errors.rejectValue("weight", REQUIRED, REQUIRED);
+        }else if (pet.getWeight() < minWeight|| pet.getWeight() > maxWeight){
+            errors.rejectValue("weight", OUT_OF_RANGE,OUT_OF_RANGE);
         }
     }
 

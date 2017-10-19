@@ -2,7 +2,6 @@
   th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
 
 <body>
-
   <h2>
     <th:block th:if="${pet['new']}">New </th:block>
     Pet
@@ -20,6 +19,8 @@
         th:replace="~{fragments/inputField :: input ('Name', 'name')}" />
       <input
         th:replace="~{fragments/inputField :: input ('Birth Date', 'birthDate')}" />
+        <input
+                th:replace="~{fragments/inputField :: input ('Weight', 'weight')}" />
       <input
         th:replace="~{fragments/selectField :: select ('Type', 'type', ${types})}" />
     </div>
