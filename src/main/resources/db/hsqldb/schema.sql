@@ -5,7 +5,23 @@ DROP TABLE visits IF EXISTS;
 DROP TABLE pets IF EXISTS;
 DROP TABLE types IF EXISTS;
 DROP TABLE owners IF EXISTS;
+DROP TABLE users IF EXISTS;
+DROP TABLE users_roles IF EXISTS;
 
+CREATE  TABLE users (
+  id INTEGER PRIMARY KEY,
+  username VARCHAR(45) UNIQUE,
+  password VARCHAR(45) NOT NULL ,
+  enabled SMALLINT NOT NULL
+);
+
+CREATE TABLE user_roles (
+  user_role_id INTEGER IDENTITY PRIMARY KEY,
+  username VARCHAR(45) NOT NULL,
+  role VARCHAR(45) NOT NULL,
+  UNIQUE(role,username),
+  CONSTRAINT fk_username FOREIGN KEY (username) REFERENCES users (username)
+);
 
 CREATE TABLE vets (
   id         INTEGER IDENTITY PRIMARY KEY,
