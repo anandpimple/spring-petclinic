@@ -73,28 +73,37 @@ class OwnerController {
 
     @RequestMapping(value = "/owners/find", method = RequestMethod.GET)
     public String initFindForm(Map<String, Object> model) {
-        model.put("owner", new Owner());
+        model.put("query", new OwnerQuery());
         return "owners/findOwners";
     }
 
     @RequestMapping(value = "/owners", method = RequestMethod.GET)
-    public String processFindForm(Owner owner, BindingResult result, Map<String, Object> model) {
-
+    public String processFindForm(OwnerQuery query,BindingResult result, Map<String, Object> model) {
         // allow parameterless GET request for /owners to return all records
-        if (owner.getLastName() == null) {
-            owner.setLastName(""); // empty string signifies broadest possible search
+        if (query.getLastName() == null) {
+            query.setLastName(""); // empty string signifies broadest possible search
+        }
+
+        if (query.getFirstName() == null) {
+            query.setFirstName(""); // empty string signifies broadest possible search
+        }
+
+        if (query.getPetName() == null) {
+            query.setPetName(""); // empty string signifies broadest possible search
         }
 
         // find owners by last name
-        Collection<Owner> results = this.owners.findByLastName(owner.getLastName());
+//        Collection<Owner> results = this.owners.findByLastName(owner.getLastName());
+        Collection<Owner> results = this.owners.findByLastNameAndFirstNameAndPetName(
+           query.getLastName(),query.getFirstName(),query.getPetName());
         if (results.isEmpty()) {
             // no owners found
-            result.rejectValue("lastName", "notFound", "not found");
+            result.reject("notFound");
+            model.put("query",query);
             return "owners/findOwners";
         } else if (results.size() == 1) {
             // 1 owner found
-            owner = results.iterator().next();
-            return "redirect:/owners/" + owner.getId();
+            return "redirect:/owners/" + results.iterator().next().getId();
         } else {
             // multiple owners found
             model.put("selections", results);

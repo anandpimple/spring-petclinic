@@ -91,13 +91,13 @@ public class OwnerControllerTests {
     public void testInitFindForm() throws Exception {
         mockMvc.perform(get("/owners/find"))
             .andExpect(status().isOk())
-            .andExpect(model().attributeExists("owner"))
+            .andExpect(model().attributeExists("query"))
             .andExpect(view().name("owners/findOwners"));
     }
 
     @Test
     public void testProcessFindFormSuccess() throws Exception {
-        given(this.owners.findByLastName("")).willReturn(Lists.newArrayList(george, new Owner()));
+        given(this.owners.findByLastNameAndFirstNameAndPetName("","","")).willReturn(Lists.newArrayList(george, new Owner()));
         mockMvc.perform(get("/owners"))
             .andExpect(status().isOk())
             .andExpect(view().name("owners/ownersList"));
@@ -105,7 +105,7 @@ public class OwnerControllerTests {
 
     @Test
     public void testProcessFindFormByLastName() throws Exception {
-        given(this.owners.findByLastName(george.getLastName())).willReturn(Lists.newArrayList(george));
+        given(this.owners.findByLastNameAndFirstNameAndPetName(george.getLastName(),"","")).willReturn(Lists.newArrayList(george));
         mockMvc.perform(get("/owners")
             .param("lastName", "Franklin")
         )
