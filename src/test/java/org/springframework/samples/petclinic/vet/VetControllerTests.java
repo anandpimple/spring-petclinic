@@ -3,6 +3,7 @@ package org.springframework.samples.petclinic.vet;
 import static org.hamcrest.xml.HasXPath.hasXPath;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -25,6 +26,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Test class for the {@link VetController}
  */
@@ -38,6 +42,9 @@ public class VetControllerTests {
     @MockBean
     private VetRepository vets;
 
+    @MockBean
+    private SpecialityRepository specialityRepository;
+
     @Before
     public void setup() {
         Vet james = new Vet();
@@ -48,11 +55,29 @@ public class VetControllerTests {
         helen.setFirstName("Helen");
         helen.setLastName("Leary");
         helen.setId(2);
+
         Specialty radiology = new Specialty();
         radiology.setId(1);
         radiology.setName("radiology");
+
         helen.addSpecialty(radiology);
+
+        Specialty  surgery = new Specialty();
+        surgery.setId(2);
+        surgery.setName("surgery");
+
+
+        Specialty  dentistry = new Specialty();
+        dentistry.setId(3);
+        dentistry.setName("dentistry");
+
+        List<Specialty> specialtyList = new ArrayList<>();
+        specialtyList.add(radiology);
+        specialtyList.add(surgery);
+        specialtyList.add(dentistry);
+
         given(this.vets.findAll()).willReturn(Lists.newArrayList(james, helen));
+        given(this.specialityRepository.findAll()).willReturn(specialtyList);
     }
 
     @Test
@@ -77,6 +102,35 @@ public class VetControllerTests {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_XML_VALUE))
             .andExpect(content().node(hasXPath("/vets/vetList[id=1]/id")));
+    }
+
+    @Test
+    public void testInitCreationForm() throws Exception {
+        mockMvc.perform(get("/vets/new"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("vets/createOrUpdateVetForm"))
+            .andExpect(model().attributeExists("vet"));
+    }
+
+    @Test
+    public void testProcessCreationFormSuccess() throws Exception {
+        mockMvc.perform(post("/vets/new")
+            .param("firstName", "TestFirstName")
+            .param("lastName", "TestLastName")
+            .param("specialties", "radiology")
+        )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/vets/vetList"));
+    }
+
+    @Test
+    public void testProcessCreationFormError() throws Exception {
+        mockMvc.perform(post("/vets/new")
+            .param("firstName", "TestFirstName")
+            .param("lastName", "TestLastName")
+        )
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(view().name("vets/createOrUpdateVetForm"));
     }
 
 }

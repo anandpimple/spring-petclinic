@@ -21,6 +21,7 @@ class CacheConfig {
         return cm -> {
             Configuration<Object, Object> cacheConfiguration = createCacheConfiguration();
             cm.createCache("vets", cacheConfiguration);
+            cm.createCache("specialties", cacheConfiguration);
         };
     }
 
